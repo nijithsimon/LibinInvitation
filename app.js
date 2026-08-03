@@ -1,8 +1,8 @@
 /*
   EDIT THE INVITATION HERE
   Every visible detail, destination link, image path and music option is kept in
-  this single object. To use your own licensed audio file, add it to
-  public/assets and set music.trackUrl to "/assets/your-song.mp3".
+  this single object. To use your own licensed audio file, add it to assets
+  and set music.trackUrl to "assets/your-song.mp3".
 */
 const INVITATION = {
   groomName: "Libin",
@@ -38,9 +38,8 @@ const INVITATION = {
     wineGlasses: "assets/wine-glasses.png"
   },
   music: {
-    // Leave empty for the included, device-generated piano-and-chime ambience.
-    // To use a music file instead: "assets/your-licensed-song.mp3"
-    trackUrl: ""
+    // Replace this file path whenever you want to use a different licensed song.
+    trackUrl: "assets/wedding-background.mp3"
   }
 };
 
@@ -256,10 +255,7 @@ function initScrollExperience() {
   placeRings();
 }
 
-let audioContext;
-let musicTimer;
 let musicPlaying = false;
-let activeOscillators = [];
 let fileAudio;
 
 function updateMusicButton() {
@@ -269,74 +265,27 @@ function updateMusicButton() {
   $('.music-label').textContent = musicPlaying ? 'Sound on' : 'Music';
 }
 
-function playTone(frequency, when, duration, volume) {
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(frequency, when);
-  gain.gain.setValueAtTime(0.0001, when);
-  gain.gain.exponentialRampToValueAtTime(volume, when + .07);
-  gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
-  oscillator.connect(gain).connect(audioContext.destination);
-  oscillator.start(when);
-  oscillator.stop(when + duration + .03);
-  activeOscillators.push(oscillator);
-  oscillator.onended = () => { activeOscillators = activeOscillators.filter((node) => node !== oscillator); };
-}
-
-function scheduleGeneratedMusic() {
-  if (!musicPlaying || !audioContext) return;
-  const now = audioContext.currentTime + .1;
-  const chords = [
-    [261.63, 329.63, 392.0, 523.25],
-    [220.0, 277.18, 329.63, 440.0],
-    [196.0, 246.94, 293.66, 392.0],
-    [246.94, 311.13, 369.99, 493.88]
-  ];
-  chords.forEach((chord, chordIndex) => {
-    const start = now + chordIndex * 3.2;
-    playTone(chord[0] / 2, start, 2.9, .022);
-    [0, 1, 2, 3, 2, 1].forEach((noteIndex, noteStep) => {
-      playTone(chord[noteIndex] * 2, start + noteStep * .48, .72, noteStep === 3 ? .035 : .021);
-    });
-  });
-  musicTimer = window.setTimeout(scheduleGeneratedMusic, 12400);
-}
-
 async function startMusic() {
-  if (musicPlaying) return;
-  musicPlaying = true;
-  if (INVITATION.music.trackUrl) {
-    if (!fileAudio) {
-      fileAudio = new Audio(INVITATION.music.trackUrl);
-      fileAudio.loop = true;
-      fileAudio.volume = .38;
-    }
-    try { await fileAudio.play(); } catch (_) { musicPlaying = false; }
-  } else {
-    audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-    await audioContext.resume();
-    scheduleGeneratedMusic();
+  if (musicPlaying || !INVITATION.music.trackUrl) return;
+  if (!fileAudio) {
+    fileAudio = new Audio(INVITATION.music.trackUrl);
+    fileAudio.loop = true;
+    fileAudio.volume = .38;
+    fileAudio.preload = 'metadata';
   }
+  try { await fileAudio.play(); musicPlaying = true; } catch (_) { musicPlaying = false; }
   updateMusicButton();
 }
 
 function stopMusic() {
   musicPlaying = false;
-  window.clearTimeout(musicTimer);
   if (fileAudio) fileAudio.pause();
-  activeOscillators.forEach((node) => { try { node.stop(); } catch (_) {} });
-  activeOscillators = [];
   updateMusicButton();
 }
 
 function initMusic() {
   $('.music-toggle').addEventListener('click', () => {
     if (musicPlaying) stopMusic(); else startMusic();
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && musicPlaying && !fileAudio) audioContext?.suspend();
-    if (!document.hidden && musicPlaying && !fileAudio) audioContext?.resume();
   });
   updateMusicButton();
 }
