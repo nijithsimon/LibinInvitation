@@ -289,8 +289,8 @@ body.is-ready .loading-screen { opacity: 0; visibility: hidden; }
 /* Families */
 .families-layout { display: grid; grid-template-columns: 1fr 3.7rem 1fr; width: min(100%, 29rem); align-items: center; margin-top: .25rem; }
 .family { min-width: 0; color: var(--ink); }
-.family-groom { text-align: right; }
-.family-bride { text-align: left; }
+.family-groom { text-align: left; }
+.family-bride { text-align: right; }
 .family-label { margin: 0; color: var(--gold-deep); font: 600 .57rem var(--sans); letter-spacing: .16em; text-transform: uppercase; }
 .family h3 { margin: .2rem 0 .12rem; font: 400 clamp(2.4rem, 9vw, 3.65rem) / .9 var(--script); }
 .family > p:not(.family-label) { margin: 0; font-size: clamp(1.13rem, 4.4vw, 1.45rem); line-height: .95; }
