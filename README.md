@@ -17,3 +17,4 @@ The Open Graph and Twitter tags in [index.html](index.html) provide a WhatsApp-f
 ## Notes
 
 The supplied wine-glass image is used directly in the reception section. It carries a visible stock watermark, so replace `assets/wine-glasses.png` with a licensed, clean version before publishing if desired.
+
