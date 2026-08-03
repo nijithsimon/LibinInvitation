@@ -1,0 +1,9 @@
+{
+  "name": "libin-diya-wedding-invitation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "preview": "npx serve ."
+  }
+}
